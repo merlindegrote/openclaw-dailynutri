@@ -7,6 +7,7 @@ The DailyNutri Integration Skill enables OpenClaw agents to interact with the Da
 ## ✨ Features
 
 - **Natural Language Food Logging**: Log meals using everyday language
+- **Meal Context Support**: Automatic detection of meal_name and meal_time
 - **Nutrition History Queries**: Ask questions about your dietary history
 - **Telegram Bot Integration**: Log food via Telegram messages
 - **OpenClaw Workflow Integration**: Seamless integration with existing workflows
@@ -29,7 +30,7 @@ openclaw skills install dailynutri-integration
 ### Method 2: Manual Installation
 ```bash
 # Clone the repository
-git clone https://github.com/[username]/openclaw-dailynutri.git
+git clone https://github.com/merlindegrote/openclaw-dailynutri.git
 cd openclaw-dailynutri
 
 # Copy to skills directory
@@ -39,7 +40,7 @@ cp -r dailynutri-integration ~/.openclaw/skills/
 ### Method 3: Direct Download
 ```bash
 # Download and extract
-curl -L https://github.com/[username]/openclaw-dailynutri/archive/main.tar.gz | tar -xz
+curl -L https://github.com/merlindegrote/openclaw-dailynutri/archive/main.tar.gz | tar -xz
 mv openclaw-dailynutri-main/dailynutri-integration ~/.openclaw/skills/
 ```
 
@@ -74,6 +75,25 @@ result = client.log_food("I had an apple and a coffee")
 print(result['reply'])
 ```
 
+### Advanced Food Logging with Meal Context
+```python
+from scripts.api_client import DailyNutriAPIClient
+
+client = DailyNutriAPIClient()
+
+# Meal name and time in natural language
+result = client.log_food("I had breakfast: oatmeal with berries at 8:30 AM")
+print(result['reply'])  # "✅ Logged breakfast! I added oatmeal with berries..."
+
+# Just meal name
+result = client.log_food("Lunch was a chicken salad")
+print(result['reply'])  # "✅ Logged lunch! I added chicken salad..."
+
+# Just meal time
+result = client.log_food("I had a snack at 3 PM: apple and nuts")
+print(result['reply'])  # "✅ Logged snack! I added apple and nuts..."
+```
+
 ### Nutrition Queries
 ```python
 result = client.query_food_history("What did I eat yesterday?")
@@ -104,12 +124,19 @@ print(result['message'])
 Initialize the API client. If no API key is provided, it will be read from the environment variable `DAILY_NUTRI_API_KEY`.
 
 #### `log_food(food_description)`
-Log food using natural language description.
+Log food using natural language description. Supports meal_name and meal_time detection.
 
 **Parameters:**
 - `food_description` (str): Description of what was eaten/drunk
+  - Can include meal context: "breakfast: oatmeal at 8 AM"
+  - Meal names: breakfast, lunch, dinner, snack, brunch, etc.
+  - Meal times: "at 8:30 AM", "around noon", "for dinner"
 
-**Returns:** Dict with API response
+**Returns:** Dict with API response including:
+  - `reply`: Human-readable response
+  - `action`: Type of action performed (log, query, etc.)
+  - `items`: List of logged items with nutrition info
+  - `meal_context`: Detected meal name and time (if any)
 
 #### `query_food_history(question)`
 Ask a question about nutrition history.
@@ -308,6 +335,35 @@ except ValueError as e:
         print("Server error. Please try again later.")
 ```
 
+#### 4. Meal Context Errors
+```python
+try:
+    # Invalid meal time format
+    result = client.log_food("I had breakfast at 25:70")
+except ValueError as e:
+    if "meal_time" in str(e):
+        print("Invalid meal time format. Use format like '8:30 AM' or '14:00'")
+```
+
+### Backward Compatibility
+
+The skill maintains full backward compatibility:
+
+**Old format (still works):**
+```python
+client.log_food("I had an apple")
+```
+
+**New format (recommended):**
+```python
+client.log_food("I had breakfast: oatmeal at 8 AM")
+```
+
+**Automatic detection:**
+- Meal names are automatically extracted from natural language
+- Meal times are parsed from time expressions
+- If detection fails, logging proceeds without meal context
+
 ## 📈 Monitoring and Logging
 
 ### Log Files
@@ -403,7 +459,7 @@ ls -la ~/.openclaw/skills/dailynutri-integration/
 ### Documentation
 - [DailyNutri API Documentation](https://dailynutri.app/api-docs)
 - [OpenClaw Skills Documentation](https://docs.openclaw.ai/skills)
-- [GitHub Repository](https://github.com/[username]/openclaw-dailynutri)
+- [GitHub Repository](https://github.com/merlindegrote/openclaw-dailynutri)
 
 ### Support
 - [GitHub Issues](https://github.com/[username]/openclaw-dailynutri/issues)

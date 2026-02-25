@@ -25,7 +25,7 @@ openclaw skills install dailynutri-integration
 ### Manual Installation
 ```bash
 # Clone the repository
-git clone https://github.com/[username]/openclaw-dailynutri.git
+git clone https://github.com/merlindegrote/openclaw-dailynutri.git
 cd openclaw-dailynutri
 
 # Copy to skills directory
@@ -35,7 +35,7 @@ cp -r dailynutri-integration ~/.openclaw/skills/
 ### Direct Download
 ```bash
 # Download and extract
-curl -L https://github.com/[username]/openclaw-dailynutri/archive/main.tar.gz | tar -xz
+curl -L https://github.com/merlindegrote/openclaw-dailynutri/archive/main.tar.gz | tar -xz
 mv openclaw-dailynutri-main/dailynutri-integration ~/.openclaw/skills/
 ```
 
@@ -67,6 +67,16 @@ result = client.log_food("I had an apple and a coffee")
 print(result['reply'])  # "✅ Logged! I added an apple (95 kcal)..."
 ```
 
+### Advanced Food Logging with Meal Context
+```python
+from scripts.api_client import DailyNutriAPIClient
+
+client = DailyNutriAPIClient()
+# Specify meal name and time for better categorization
+result = client.log_food("I had breakfast: oatmeal with berries at 8:30 AM")
+print(result['reply'])  # "✅ Logged breakfast! I added oatmeal with berries..."
+```
+
 ### Nutrition Queries
 ```python
 result = client.query_food_history("What did I eat yesterday?")
@@ -80,6 +90,33 @@ from scripts.telegram_bot import process_telegram_message
 response = process_telegram_message("I just had lunch: salad with chicken")
 print(response)  # "✅ Logged! I added salad with chicken..."
 ```
+
+## 🆕 New Features (v1.0.0)
+
+### Meal Name & Time Support
+The skill now supports enhanced meal logging with `meal_name` and `meal_time` context:
+
+**Natural Language Integration:**
+- **Meal Names**: breakfast, lunch, dinner, snack, brunch, etc.
+- **Meal Times**: "at 8:30 AM", "around noon", "for dinner"
+- **Automatic Detection**: The API automatically detects meal context from natural language
+
+**Examples:**
+```python
+# Meal name and time in natural language
+client.log_food("I had breakfast: oatmeal with berries at 8:30 AM")
+client.log_food("Lunch was a chicken salad around 1 PM")
+client.log_food("For dinner I had salmon with vegetables")
+```
+
+**Backward Compatibility:**
+- Old format still works: "I had an apple"
+- New format enhances categorization: "I had breakfast: oatmeal at 8 AM"
+
+### Enhanced Error Handling
+- Better validation for meal_name and meal_time parameters
+- Graceful fallback when meal context cannot be determined
+- Clear error messages for invalid meal times
 
 ## 📖 Documentation
 
@@ -115,7 +152,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [DailyNutri Website](https://dailynutri.app)
 - [OpenClaw Documentation](https://docs.openclaw.ai)
 - [ClawHub](https://clawhub.com)
-- [GitHub Repository](https://github.com/[username]/openclaw-dailynutri)
+- [GitHub Repository](https://github.com/merlindegrote/openclaw-dailynutri)
 
 ---
 
