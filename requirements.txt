@@ -1,0 +1,9 @@
+# DailyNutri Integration Skill Requirements
+# Python dependencies for the skill
+
+requests>=2.28.0
+
+# Optional dependencies for advanced features
+# pandas>=1.5.0  # For data analysis
+# matplotlib>=3.6.0  # For visualization
+# python-dotenv>=0.21.0  # For environment variable management
